@@ -1,5 +1,6 @@
 defmodule TelemetryUiExampleWeb.Router do
   use TelemetryUiExampleWeb, :router
+  import Plug.BasicAuth
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -10,6 +11,17 @@ defmodule TelemetryUiExampleWeb.Router do
     plug :put_secure_browser_headers
   end
 
+  pipeline :admin_protected do
+    plug(:basic_auth,
+      username: "admin",
+      password: "admin"
+    )
+
+    plug(:enable_telemetry_ui)
+  end
+
+  defp enable_telemetry_ui(conn, _), do: assign(conn, :telemetry_ui_allowed, true)
+
   pipeline :api do
     plug :accepts, ["json"]
   end
@@ -18,6 +30,12 @@ defmodule TelemetryUiExampleWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
+  end
+
+  scope "/admin" do
+    pipe_through [:browser, :admin_protected]
+
+    get("/metrics", TelemetryUI.Web, [], assigns: %{telemetry_ui_allowed: true})
   end
 
   # Other scopes may use custom stacks.

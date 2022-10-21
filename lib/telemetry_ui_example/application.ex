@@ -24,9 +24,11 @@ defmodule TelemetryUiExample.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: TelemetryUiExample.PubSub},
       # Start the Endpoint (http/https)
-      TelemetryUiExampleWeb.Endpoint
+      TelemetryUiExampleWeb.Endpoint,
       # Start a worker by calling: TelemetryUiExample.Worker.start_link(arg)
       # {TelemetryUiExample.Worker, arg}
+
+      {TelemetryUI, telemetry_config()}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -41,5 +43,32 @@ defmodule TelemetryUiExample.Application do
   def config_change(changed, _new, removed) do
     TelemetryUiExampleWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp telemetry_config do
+    import TelemetryUI.Metrics
+
+    [
+      metrics: [
+        counter("phoenix.router_dispatch.stop.duration",
+          description: "Number of requests",
+          unit: {:native, :millisecond},
+          ui_options: [unit: " requests"]
+        ),
+        value_over_time("vm.memory.total", unit: {:byte, :megabyte}),
+        distribution("phoenix.router_dispatch.stop.duration",
+          description: "Requests duration",
+          unit: {:native, :millisecond},
+          reporter_options: [buckets: [0, 100, 500, 2000]]
+        )
+      ],
+      backend: %TelemetryUI.Backend.EctoPostgres{
+        repo: TelemetryUiExample.Repo,
+        pruner_threshold: [months: -1],
+        pruner_interval_ms: 84_000,
+        max_buffer_size: 10_000,
+        flush_interval_ms: 10_000
+      }
+    ]
   end
 end
