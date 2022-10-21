@@ -50,6 +50,11 @@ defmodule TelemetryUiExample.Application do
 
     [
       metrics: [
+        value_over_time("page.index.duration",
+          description: "Execution time for page index",
+          unit: :millisecond,
+          ui_options: [unit: " milliseconds"]
+        ),
         counter("phoenix.router_dispatch.stop.duration",
           description: "Number of requests",
           unit: {:native, :millisecond},
