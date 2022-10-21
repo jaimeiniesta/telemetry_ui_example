@@ -1,5 +1,11 @@
 # TelemetryUiExample
 
+A quick example of [Telemetry UI](https://hex.pm/packages/telemetry_ui).
+
+The home page has a random sleep that is tracked via the [:page, :index] event.
+
+See metrics at http://localhost:4000/admin/metrics - credentials are in the router.ex file.
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
