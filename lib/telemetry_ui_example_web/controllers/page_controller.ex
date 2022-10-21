@@ -2,6 +2,14 @@ defmodule TelemetryUiExampleWeb.PageController do
   use TelemetryUiExampleWeb, :controller
 
   def index(conn, _params) do
-    render(conn, "index.html")
+    start = System.monotonic_time()
+
+    100 |> :rand.uniform() |> :timer.sleep()
+
+    duration =
+      (System.monotonic_time() - start)
+      |> System.convert_time_unit(:native, :millisecond)
+
+    render(conn, "index.html", duration: duration)
   end
 end
