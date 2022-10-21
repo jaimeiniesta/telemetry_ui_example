@@ -7,6 +7,15 @@ defmodule TelemetryUiExample.Application do
 
   @impl true
   def start(_type, _args) do
+    # Start metrics
+    :ok =
+      :telemetry.attach(
+        "metrics",
+        [:page, :index],
+        &TelemetryUiExample.Metrics.handle_event/4,
+        nil
+      )
+
     children = [
       # Start the Ecto repository
       TelemetryUiExample.Repo,

@@ -10,6 +10,8 @@ defmodule TelemetryUiExampleWeb.PageController do
       (System.monotonic_time() - start)
       |> System.convert_time_unit(:native, :millisecond)
 
+    :telemetry.execute([:page, :index], %{duration: duration}, %{})
+
     render(conn, "index.html", duration: duration)
   end
 end
